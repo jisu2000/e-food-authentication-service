@@ -10,4 +10,5 @@ import com.subhadeep.e_food_authentication_service.model.RefreshTokenEO;
 public interface RefreshTokenRepo extends JpaRepository<RefreshTokenEO,Integer>{
     RefreshTokenEO findByToken(String token);
     List<RefreshTokenEO> findByUserId(Integer userId);
+    void deleteByUserId(Integer userId);
 }

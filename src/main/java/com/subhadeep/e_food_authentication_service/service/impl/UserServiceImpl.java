@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.subhadeep.e_food_authentication_service.exceptions.UnauthorizeException;
+import com.subhadeep.e_food_authentication_service.model.RefreshTokenEO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -129,8 +131,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Map<?, ?> deleteUser(Integer userId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteUser'");
+
+        UserEO fetchedUser = userRepo.findById(userId)
+                .orElseThrow(()-> new ResourceNotFoundException("User","ID",userId.toString()));
+
+        userRepo.delete(fetchedUser);
+        refreshTokenService.getAllUserTokens(userId);
+
+        return Map.of("msg","User Deleted");
     }
 
     @Override
@@ -204,6 +212,27 @@ public class UserServiceImpl implements UserService {
     public HttpServletResponse getCurrentResponse() {
         ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         return attrs != null ? attrs.getResponse() : null;
+    }
+
+    @Override
+    public UserDTO getCurrentUser() {
+        UserEO currentUser = authenticationService.getCurrentUserObject();
+        return modelMapper.map(currentUser,UserDTO.class);
+    }
+
+    @Override
+    public Map<?, ?> userDeletedBySelf() {
+         UserEO currentUser = authenticationService.getCurrentUserObject();
+
+         Integer userId = currentUser.getId();
+         if(currentUser == null){
+             throw new UnauthorizeException("Invalid token");
+         }
+             userRepo.delete(currentUser);
+             refreshTokenService.deleteAllUserRefreshToken(userId);
+
+             return Map.of("msg","User deleted");
+
     }
 
 }

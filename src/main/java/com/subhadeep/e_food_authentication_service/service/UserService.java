@@ -17,5 +17,6 @@ public interface UserService {
     Map<?,?> deleteUser(Integer userId);
     PaginatedResponse getAllUsers(Integer pageNo, Integer pageSize,String sortBy, String sortDir);
     Map<?,?> loginUser(Map<String,String> loginRequest);
-
+    UserDTO getCurrentUser();
+    Map<?,?> userDeletedBySelf();
 }

@@ -99,8 +99,9 @@ public class JwtUtils {
         if (isTokenBlacklisted(token)) {
             return false;
         }
+        AuthUser authUser = (AuthUser) userDetails;
         final String username = getUsernameFromToken(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        return (username.equals(userDetails.getUsername()) && Objects.equals(authUser.getUserId(), getUserId(token)) && !isTokenExpired(token));
     }
 
     public List<String> getRolesFromToken(String token) {
@@ -111,5 +112,10 @@ public class JwtUtils {
         @SuppressWarnings("unchecked")
         List<String> roles = (List<String>) claims.get("roles");
         return roles != null ? roles : Collections.emptyList();
+    }
+
+    public Integer getUserId(String token){
+        Claims claims = getAllClaimsFromToken(token);
+        return Integer.parseInt(claims.get("id").toString());
     }
 }

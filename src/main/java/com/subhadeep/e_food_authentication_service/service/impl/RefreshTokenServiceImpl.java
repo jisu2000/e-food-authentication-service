@@ -1,9 +1,11 @@
 package com.subhadeep.e_food_authentication_service.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -82,6 +84,17 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
 
         return Map.of("msg", "Access token Refreshed");
 
+    }
+
+    @Override
+    public List<RefreshTokenEO> getAllUserTokens(Integer userId) {
+       return refreshTokenRepo.findByUserId(userId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteAllUserRefreshToken(Integer userId) {
+        refreshTokenRepo.deleteByUserId(userId);
     }
 
     public HttpServletResponse getCurrentResponse() {

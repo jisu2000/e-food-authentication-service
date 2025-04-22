@@ -4,10 +4,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.subhadeep.e_food_authentication_service.constant.PageConstant;
 import com.subhadeep.e_food_authentication_service.service.UserService;
@@ -35,6 +32,16 @@ public class SecureController {
         return new ResponseEntity<>(userService
                 .getAllUsers(pageNo, pageSize, sortBy, sortDir),
                 HttpStatus.OK);
+    }
+
+    @GetMapping("/current/user")
+    public ResponseEntity<?> getAuthenticatedUser(){
+        return new ResponseEntity<>(userService.getCurrentUser(),HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete/self")
+    public ResponseEntity<?> deleteUser(){
+        return new ResponseEntity<>(userService.userDeletedBySelf(),HttpStatus.OK);
     }
 
 }
