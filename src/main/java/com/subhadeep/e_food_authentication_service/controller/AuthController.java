@@ -6,8 +6,10 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.subhadeep.e_food_authentication_service.dto.UserDTO;
+import com.subhadeep.e_food_authentication_service.service.RefreshTokenService;
 import com.subhadeep.e_food_authentication_service.service.UserService;
 import lombok.RequiredArgsConstructor;
 
@@ -26,6 +29,7 @@ public class AuthController {
 
     private final UserService userService;
     private final ObjectMapper objectMapper;
+    private final RefreshTokenService refreshTokenService;
 
     @PostMapping(path = "/register/customer", consumes = { "multipart/form-data" })
     public ResponseEntity<?> registerUser(
@@ -42,8 +46,11 @@ public class AuthController {
         return new ResponseEntity<>(userService.loginUser(body), HttpStatus.OK);
     }
 
-
-    
+    @GetMapping("/refresh")
+    public ResponseEntity<?> refreshToken(
+            @RequestHeader("RefreshToken") String token) {
+        return new ResponseEntity<>(refreshTokenService.refreshToken(token), HttpStatus.OK);
+    }
 
     private UserDTO getDtofromString(String data) {
 

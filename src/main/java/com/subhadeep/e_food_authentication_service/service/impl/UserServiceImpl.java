@@ -1,4 +1,4 @@
-package com.subhadeep.e_food_authentication_service.service;
+package com.subhadeep.e_food_authentication_service.service.impl;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -34,6 +35,9 @@ import com.subhadeep.e_food_authentication_service.repo.UserRepo;
 import com.subhadeep.e_food_authentication_service.security.AuthUser;
 import com.subhadeep.e_food_authentication_service.security.AuthenticationService;
 import com.subhadeep.e_food_authentication_service.security.JwtUtils;
+import com.subhadeep.e_food_authentication_service.service.FileUploadserService;
+import com.subhadeep.e_food_authentication_service.service.RefreshTokenService;
+import com.subhadeep.e_food_authentication_service.service.UserService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -45,6 +49,9 @@ import lombok.RequiredArgsConstructor;
 @Validated
 public class UserServiceImpl implements UserService {
 
+    @Value("${folder.name.PROFILE_PHOTO_IMAGE_FOLDER}")
+    private String profilePhotoFolder;
+
     private final UserRepo userRepo;
     private final PasswordEncoder passwordEncoder;
     private final ModelMapper modelMapper;
@@ -52,6 +59,7 @@ public class UserServiceImpl implements UserService {
     private final RefreshTokenService refreshTokenService;
     private final JwtUtils jwtUtils;
     private final AuthenticationService authenticationService;
+    private final FileUploadserService fileUploadserService;
 
     @Override
     public Map<?, ?> registerAsCustomer(@Valid UserDTO data, MultipartFile multipartFile) {
@@ -67,7 +75,20 @@ public class UserServiceImpl implements UserService {
             throw new InvalidRequestException("Mobile Number has been used already");
         }
 
+        String photoUrl = null;
+
+        if (multipartFile != null) {
+            try {
+                photoUrl = fileUploadserService.uploadFile(multipartFile, profilePhotoFolder);
+            } catch (Exception e) {
+            }
+        }
+
         UserEO goingTosave = modelMapper.map(data, UserEO.class);
+
+        if (photoUrl != null) {
+            goingTosave.setProfilePhoto(photoUrl);
+        }
 
         RoleEO userRole = roleRepo.findById(RoleConstants.USER_ROLE_ID)
                 .orElseThrow(() -> new ResourceNotFoundException("ROLE", "role", "USER"));

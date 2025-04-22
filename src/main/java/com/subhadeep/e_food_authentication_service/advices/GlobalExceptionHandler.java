@@ -2,7 +2,6 @@ package com.subhadeep.e_food_authentication_service.advices;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -84,6 +83,18 @@ public class GlobalExceptionHandler {
 
                         )
                         .build());
+    }
+
+
+    @ExceptionHandler(UnauthorizeException.class)
+    public ResponseEntity<?> handleUnauthrizeException(UnauthorizeException ex){
+        return buildResponseEntityFromErrorResponse(
+                ErrorResponse.builder()
+                        .status(401)
+                        .error(ex.getMessage())
+                        .subErrors(new ArrayList<>())
+                        .build()
+        );
     }
 
     @ExceptionHandler(InvalidCredException.class)
