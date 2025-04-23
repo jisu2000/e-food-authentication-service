@@ -19,4 +19,5 @@ public interface UserService {
     Map<?,?> loginUser(Map<String,String> loginRequest);
     UserDTO getCurrentUser();
     Map<?,?> userDeletedBySelf();
+    Map<?,?> doLogOut(String authHeader);
 }

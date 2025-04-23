@@ -235,4 +235,17 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public Map<?, ?> doLogOut(String authHeader) {
+        String token = authHeader.substring(7);
+
+        try {
+            jwtUtils.blacklistToken(token);
+            return Map.of("msg","Logged out");
+        } catch (Exception e) {
+
+        }
+        throw new UnauthorizeException("Invalid Token");
+    }
+
 }

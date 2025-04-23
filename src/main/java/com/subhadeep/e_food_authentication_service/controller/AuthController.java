@@ -5,13 +5,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -50,6 +44,14 @@ public class AuthController {
             @RequestHeader("RefreshToken") String token) {
         return new ResponseEntity<>(refreshTokenService.refreshToken(token), HttpStatus.OK);
     }
+
+    @DeleteMapping("/logout")
+    public ResponseEntity<?> logoutUser(
+            @RequestHeader("Authorization") String authHeader
+    ){
+        return new ResponseEntity<>(userService.doLogOut(authHeader),HttpStatus.OK);
+    }
+
 
     private UserDTO getDtofromString(String data) {
 

@@ -1,5 +1,7 @@
 package com.subhadeep.e_food_authentication_service.security;
 
+import com.subhadeep.e_food_authentication_service.model.BlackLIstTokenEO;
+import com.subhadeep.e_food_authentication_service.repo.BlackListedTokenRepo;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 
@@ -10,6 +12,8 @@ import org.springframework.stereotype.Component;
 
 import com.subhadeep.e_food_authentication_service.constant.TokenExpiryConstant;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -21,16 +25,27 @@ public class JwtUtils {
     @Value("${jwt.secret}")
     private String jwtSecret;
 
+    private final BlackListedTokenRepo blackListedTokenRepo;
+
     public void blacklistToken(String token) {
 
         if (isTokenBlacklisted(token)) {
             throw new IllegalArgumentException("Token is blacklisted");
         }
+        BlackLIstTokenEO blackLIstTokenEO = new BlackLIstTokenEO();
+        blackLIstTokenEO.setToken(token);
+        Date expireDate = getExpirationDateFromToken(token);
+        LocalDateTime localDateTime = expireDate.toInstant()
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
+        blackLIstTokenEO.setTimeToBeStored(localDateTime);
+
+        blackListedTokenRepo.save(blackLIstTokenEO);
 
     }
 
     public boolean isTokenBlacklisted(String token) {
-        return false;
+        return blackListedTokenRepo.findByToken(token)!=null;
     }
 
     public String getUsernameFromToken(String token) {
