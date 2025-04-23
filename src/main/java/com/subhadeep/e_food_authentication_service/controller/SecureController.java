@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import com.subhadeep.e_food_authentication_service.constant.PageConstant;
@@ -18,6 +19,7 @@ public class SecureController {
 
     private final UserService userService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/list")
     public ResponseEntity<?> getAllUser(
             @RequestParam(value = "pageNo", required = false, defaultValue = PageConstant.DEFAULT_PAGE_NO) Integer pageNo,
